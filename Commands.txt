@@ -1,0 +1,17 @@
+install ms from: https://uchicago.app.box.com/s/l3e5uf13tikfjm7e1il1eujitlsjdx13/file/352115244835
+
+#untar the file: 
+tar -xzvf ms.tar.gz 
+
+#cd to ms dir
+cd msdir
+
+#install
+gcc -o ms ms.c streec.c rand1.c -lm
+
+#create and activate conda environment
+conda create --name CNN
+source activate CNN
+
+#simulate data 
+nohup python simulate_ms_SNP_trees_CNN.py &
