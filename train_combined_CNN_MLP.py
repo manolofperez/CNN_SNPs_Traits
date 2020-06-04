@@ -51,7 +51,7 @@ def create_cnn(xtest, regularizer=None):
 	x = Dense(125, activation='relu')(x)
 	x = Dropout(0.5)(x)
 	x = Dense(125, activation='relu')(x)
-	x = Dropout(0.25)(x)
+	x = Dropout(0.5)(x)
 	# Apply another fully-connected layer, this one to match the number of nodes coming out of the MLP
 	x = Dense(6, kernel_regularizer=regularizer)(x)
 	x = Activation("relu")(x)
@@ -61,7 +61,7 @@ def create_cnn(xtest, regularizer=None):
 	return model
 
 
-path = r'../traits/BM' # use your path
+path = r'/traits/BM' # use your path
 all_files = glob.glob(path + "/*.txt")
 all_files.sort(key=os.path.getmtime)
 

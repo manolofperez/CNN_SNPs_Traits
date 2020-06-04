@@ -66,3 +66,4 @@ for(j in 1:length(trees)) {
 		
 		write.table(as.matrix(ordered_sims), paste0("./traits/OU/", j, ".txt"),row.names=F,col.names=F)
 	}
+
