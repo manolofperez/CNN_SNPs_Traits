@@ -16,6 +16,6 @@ source activate CNN
 #simulate data 
 nohup python simulate_ms_SNP_trees_CNN.py &
 
-#Start R
-sudo -i R
+#run R script to simulate traits
+nohup R CMD BATCH SimulateTraits.R &
 
