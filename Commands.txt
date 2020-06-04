@@ -15,3 +15,7 @@ source activate CNN
 
 #simulate data 
 nohup python simulate_ms_SNP_trees_CNN.py &
+
+#Start R
+sudo -i R
+
