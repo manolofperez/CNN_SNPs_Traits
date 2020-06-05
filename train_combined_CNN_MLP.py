@@ -61,7 +61,7 @@ def create_cnn(xtest, regularizer=None):
 	return model
 
 
-path = r'/traits/BM' # use your path
+path = r'./traits/BM' # use your path
 all_files = glob.glob(path + "/*.txt")
 all_files.sort(key=os.path.getmtime)
 
@@ -88,7 +88,7 @@ y = y[shf]
 x = x[shf]
 df = df[shf]
 
-xtrain, xtest = x[10:], x[:10]
+xtrain, xtest = x[1000:], x[:10]
 ytrain, ytest = y[10:], y[:10]
 dftrain, dftest = df[10:], df[:10]
 
