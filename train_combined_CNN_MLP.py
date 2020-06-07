@@ -46,7 +46,7 @@ def create_cnn(xtest, regularizer=None):
 	x = Dropout(0.75)(x)
 	x = Conv1D(125, kernel_size=2, activation='relu')(x)
 	x = AveragePooling1D(pool_size=2)(x)
-	x = Dropout(0.5)(x)
+	x = Dropout(0.75)(x)
 	x = Flatten()(x)
 	x = Dense(125, activation='relu')(x)
 	x = Dropout(0.5)(x)
@@ -75,22 +75,22 @@ u2 = np.load("trainingSims/simModel2.npz")
 u3 = np.load("trainingSims/simModel3.npz")
 x=np.concatenate((u1['simModel1'],u2['simModel2'],u3['simModel3']),axis=0)
 
-y=[0 for i in xrange(len(u1['simModel1']))]
-y.extend([1 for i in xrange(len(u2['simModel2']))])
-y.extend([2 for i in xrange(len(u3['simModel3']))])
+y=[0 for i in range(len(u1['simModel1']))]
+y.extend([1 for i in range(len(u2['simModel2']))])
+y.extend([2 for i in range(len(u3['simModel3']))])
 y = np.array(y)
 
-print len(x), len(y)
-shf = range(len(x))
+print (len(x), len(y), len(df))
+shf = list(range(len(x)))
 shuffle(shf)
 
 y = y[shf]
 x = x[shf]
 df = df[shf]
 
-xtrain, xtest = x[1000:], x[:10]
-ytrain, ytest = y[10:], y[:10]
-dftrain, dftest = df[10:], df[:10]
+xtrain, xtest = x[1000:], x[:1000]
+ytrain, ytest = y[1000:], y[:1000]
+dftrain, dftest = df[1000:], df[:1000]
 
 
 ytest = keras.utils.to_categorical(ytest, num_classes)
@@ -108,6 +108,7 @@ combinedInput = concatenate([mlp.output, cnn.output])
 x = Dense(6, activation="relu")(combinedInput)
 x = Dense(num_classes, activation="sigmoid")(x)
 
+
 # The final model accepts numerical data on the MLP input and images on the CNN input, outputting a single value
 model1 = Model(inputs=[mlp.input, cnn.input], outputs=x)
 
@@ -116,10 +117,42 @@ model1.compile(loss=keras.losses.categorical_crossentropy,
 	              metrics=['accuracy'])
 
 print(model1.summary())
+
 model1.fit([dftrain, xtrain], ytrain, batch_size=batch_size,
           epochs=epochs,
           verbose=1,
           validation_data=([dftest, xtest], ytest))
 
+model1.save(filepath='Trained_Model.acc.mod')
 
-model.save(filepath='Trained_Model.acc.mod')
+xCNN = Dense(num_classes, activation="sigmoid")(cnn.output)
+
+model2 = Model(inputs=cnn.input, outputs=xCNN)
+
+model2.compile(loss=keras.losses.categorical_crossentropy,
+	              optimizer=keras.optimizers.Adam(),
+	              metrics=['accuracy'])
+
+print(model2.summary())
+
+model2.fit(xtrain, ytrain, batch_size=batch_size,
+          epochs=epochs,
+          verbose=1,
+          validation_data=(xtest, ytest))
+
+
+xMLP = Dense(num_classes, activation="sigmoid")(mlp.output)
+
+model3 = Model(inputs=mlp.input, outputs=xMLP)
+
+model3.compile(loss=keras.losses.categorical_crossentropy,
+	              optimizer=keras.optimizers.Adam(),
+	              metrics=['accuracy'])
+
+print(model3.summary())
+
+model3.fit(dftrain, ytrain, batch_size=batch_size,
+          epochs=epochs,
+          verbose=1,
+          validation_data=(dftest, ytest))
+
