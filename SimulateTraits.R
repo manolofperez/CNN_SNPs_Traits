@@ -1,5 +1,4 @@
-setwd("/Users/manolo/Desktop/SimulateTraits/test/CNN_SNPs_Trais")
-getwd()
+#!/usr/bin/env Rscript
 
 # Script By: Manolo Perez
 # A script to simulate continuous traits on several newick trees saved in a file.

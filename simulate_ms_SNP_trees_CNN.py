@@ -9,7 +9,7 @@ import os
 import math
 import shlex, subprocess
 import numpy as np
-    
+
 def ms2nparray(xfile):
 	g = list(xfile)
 	k = [idx for idx,i in enumerate(g) if len(i) > 0 and i.startswith(b'//')]
@@ -18,17 +18,17 @@ def ms2nparray(xfile):
 		L = g[i+5:i+nDNANsam+5]
 		q = []
 		for i in L:
-			i = [int(j) for j in list(i)]
+			i = [int(j-48) for j in list(i)]
 			i = np.array(i, dtype=np.int8)
 			q.append(i)
 		q = np.array(q)
 		q = q.astype("int8")
 		f.append(np.array(q))   
 	return f
-	
+
 def get_newick(xfile):
 	g = list(xfile)
-	k = [idx for idx,i in enumerate(g) if len(i) > 0 and i.startswith('//')]
+	k = [idx for idx,i in enumerate(g) if len(i) > 0 and i.startswith(b'//')]
 	for i in k:
 		n = g[i+1]
 	return n
@@ -127,7 +127,7 @@ for i in range(Priorsize):
 	## save parameter values and models
 	parameters.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Ne, RootDivTime, T1, T2, T3, T4, T5, T6))
 	models.write("1\n")
-	trees.write("%s\n" % (get_newick(output)))
+	trees.write("%s\n" % (get_newick(output).decode('utf-8')))
 	print("Completed %d %% of Model 1 simulations" % (float(i)/Priorsize*100))
 
 
@@ -170,7 +170,7 @@ for i in range(Priorsize):
 	## save parameter values and models
 	parameters.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Ne, RootDivTime, T1, T2, T3, T4, T5, T6))
 	models.write("2\n")
-	trees.write("%s\n" % (get_newick(output)))
+	trees.write("%s\n" % (get_newick(output).decode('utf-8')))
 	print("Completed %d %% of Model 2 simulations" % (float(i)/Priorsize*100))
 
 
@@ -218,7 +218,7 @@ for i in range(Priorsize):
 	## save parameter values
 	parameters.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Ne, RootDivTime, T1, T2, T3, T4, T5, T6))
 	models.write("3\n")
-	trees.write("%s\n" % (get_newick(output)))
+	trees.write("%s\n" % (get_newick(output).decode('utf-8')))
 	print("Completed %d %% of Model 3 simulations" % (float(i)/Priorsize*100))
 
 simModel3=np.array(simModel3)
