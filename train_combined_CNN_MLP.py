@@ -97,6 +97,7 @@ ytest = keras.utils.to_categorical(ytest, num_classes)
 ytrain = keras.utils.to_categorical(ytrain, num_classes)
 dftrain=dftrain.reshape((dftrain.shape[0], (dftrain.shape[1]*dftrain.shape[2])))
 dftest=dftest.reshape((dftest.shape[0], (dftest.shape[1]*dftest.shape[2])))
+
 # Create the MLP and CNN models
 mlp = create_mlp(dftrain)
 cnn = create_cnn(xtest)
