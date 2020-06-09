@@ -61,7 +61,7 @@ def create_cnn(xtest, regularizer=None):
 	return model
 
 
-path = r'./traits/BM' # use your path
+path = r'./traits/OU' # use your path
 all_files = glob.glob(path + "/*.txt")
 all_files.sort(key=os.path.getmtime)
 
@@ -97,7 +97,6 @@ ytest = keras.utils.to_categorical(ytest, num_classes)
 ytrain = keras.utils.to_categorical(ytrain, num_classes)
 dftrain=dftrain.reshape((dftrain.shape[0], (dftrain.shape[1]*dftrain.shape[2])))
 dftest=dftest.reshape((dftest.shape[0], (dftest.shape[1]*dftest.shape[2])))
-
 # Create the MLP and CNN models
 mlp = create_mlp(dftrain)
 cnn = create_cnn(xtest)
@@ -124,7 +123,7 @@ model1.fit([dftrain, xtrain], ytrain, batch_size=batch_size,
           verbose=1,
           validation_data=([dftest, xtest], ytest))
 
-model1.save(filepath='Trained_Model.acc.mod')
+model1.save(filepath='Trained_Comb_Model.acc.mod')
 
 xCNN = Dense(num_classes, activation="sigmoid")(cnn.output)
 
@@ -141,6 +140,8 @@ model2.fit(xtrain, ytrain, batch_size=batch_size,
           verbose=1,
           validation_data=(xtest, ytest))
 
+model2.save(filepath='Trained_CNN_Model.acc.mod')
+
 
 xMLP = Dense(num_classes, activation="sigmoid")(mlp.output)
 
@@ -156,4 +157,7 @@ model3.fit(dftrain, ytrain, batch_size=batch_size,
           epochs=epochs,
           verbose=1,
           validation_data=(dftest, ytest))
+          
+model3.save(filepath='Trained_Traits_Model.acc.mod')
+
 
