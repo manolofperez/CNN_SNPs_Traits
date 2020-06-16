@@ -77,6 +77,7 @@ simModel3 = []
 parameters = open("parameters.txt","w")
 models = open("models.txt","w")
 trees = open("trees.txt","w")
+os.mkdir("trainingSims")
 
 #Define default values for priors absent in some models.
 T5=0
@@ -101,7 +102,7 @@ for i in range(Priorsize):
 
 
 simModel1=np.array(simModel1)
-np.savez_compressed('simModel1.npz', simModel1=simModel1)
+np.savez_compressed('trainingSims/simModel1.npz', simModel1=simModel1)
 del(simModel1)
 
 ### Clade ES Splitter Model
@@ -119,7 +120,7 @@ for i in range(Priorsize):
 	simModel2.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(nDNANsam,-1).T)
 
 	## save parameter values and models
-	parameters.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Ne, RootDivTime, T1, T2, T3, T4, T5, T6))
+	parameters.write("%f\t%f\n" % (Theta, coalRootDivTime))
 	models.write("2\n")
 	trees.write("%s\n" % (get_newick(output).decode('utf-8')))
 	print("Completed %d %% of Model 2 simulations" % (float(i)/Priorsize*100))
@@ -127,7 +128,7 @@ for i in range(Priorsize):
 
 
 simModel2=np.array(simModel2)
-np.savez_compressed('simModel2.npz', simModel2=simModel2)
+np.savez_compressed('trainingSims/simModel2.npz', simModel2=simModel2)
 del(simModel2)
 
 
@@ -144,10 +145,10 @@ for i in range(Priorsize):
 	output = com.read().splitlines()
 	simModel3.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(nDNANsam,-1).T)
 	## save parameter values
-	parameters.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Ne, RootDivTime, T1, T2, T3, T4, T5, T6))
+	parameters.write("%f\t%f\n" % (Theta, coalRootDivTime))
 	models.write("3\n")
 	trees.write("%s\n" % (get_newick(output).decode('utf-8')))
 	print("Completed %d %% of Model 3 simulations" % (float(i)/Priorsize*100))
 
 simModel3=np.array(simModel3)
-np.savez_compressed('simModel3.npz', simModel3=simModel3)
+np.savez_compressed('trainingSims/simModel3.npz', simModel3=simModel3)

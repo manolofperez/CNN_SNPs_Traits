@@ -88,17 +88,18 @@ y = y[shf]
 x = x[shf]
 df = df[shf]
 
-xtrain, xtest = x[1000:], x[:1000]
-ytrain, ytest = y[1000:], y[:1000]
-dftrain, dftest = df[1000:], df[:1000]
+xtrain, xtest = x[100:], x[:100]
+ytrain, ytest = y[100:], y[:100]
+dftrain, dftest = df[100:], df[:100]
 
 
 ytest = keras.utils.to_categorical(ytest, num_classes)
 ytrain = keras.utils.to_categorical(ytrain, num_classes)
 dftrain=dftrain.reshape((dftrain.shape[0], (dftrain.shape[1]*dftrain.shape[2])))
 dftest=dftest.reshape((dftest.shape[0], (dftest.shape[1]*dftest.shape[2])))
+dftrain, dftest = process_structured_data(dftrain, dftest)
 # Create the MLP and CNN models
-mlp = create_mlp(dftrain)
+mlp = create_mlp(dftrain.shape)
 cnn = create_cnn(xtest)
 
 # Create the input to the final set of layers as the output of both the MLP and CNN
@@ -106,7 +107,7 @@ combinedInput = concatenate([mlp.output, cnn.output])
 
 # The final fully-connected layer head will have two dense layers (one relu and one sigmoid)
 x = Dense(6, activation="relu")(combinedInput)
-x = Dense(num_classes, activation="sigmoid")(x)
+x = Dense(num_classes, activation="softmax")(x)
 
 
 # The final model accepts numerical data on the MLP input and images on the CNN input, outputting a single value
@@ -125,7 +126,7 @@ model1.fit([dftrain, xtrain], ytrain, batch_size=batch_size,
 
 model1.save(filepath='Trained_Comb_Model.acc.mod')
 
-xCNN = Dense(num_classes, activation="sigmoid")(cnn.output)
+xCNN = Dense(num_classes, activation="softmax")(cnn.output)
 
 model2 = Model(inputs=cnn.input, outputs=xCNN)
 
@@ -143,7 +144,7 @@ model2.fit(xtrain, ytrain, batch_size=batch_size,
 model2.save(filepath='Trained_CNN_Model.acc.mod')
 
 
-xMLP = Dense(num_classes, activation="sigmoid")(mlp.output)
+xMLP = Dense(num_classes, activation="softmax")(mlp.output)
 
 model3 = Model(inputs=mlp.input, outputs=xMLP)
 
