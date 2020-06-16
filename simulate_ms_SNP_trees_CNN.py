@@ -37,7 +37,7 @@ def get_newick(xfile):
 ### variable declarations
 
 #define the number of simulations
-Priorsize = 10000
+Priorsize = 1000
 
 ## nDNA sample size of ART2.
 nDNAART2 = 8

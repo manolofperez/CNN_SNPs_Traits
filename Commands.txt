@@ -23,6 +23,7 @@ nohup python simulate_ms_SNP_trees_CNN.py &
 nohup R CMD BATCH SimulateTraits.R &
 
 #train the network
+nohup python train_combined_CNN_MLP.py &
 
 
 
