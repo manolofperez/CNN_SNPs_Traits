@@ -31,10 +31,10 @@ def process_structured_data(dftrain, dftest):
 def create_mlp(dftrain, regularizer=None):
 	"""Creates a simple two-layer MLP with inputs of the given dimension"""
 	model = Sequential()
-	model.add(Dense(10, input_dim=dftrain.shape[1], activation="relu", kernel_regularizer=regularizer))
-	model.add(Dense(6, activation="relu", kernel_regularizer=regularizer))
+	model.add(Dense(10, input_dim=dftrain.shape[1], activation="relu", kernel_regularizer=regularizers.l1(0.001)))
+	model.add(Dropout(0.5))
+	model.add(Dense(6, activation="relu", kernel_regularizer=regularizers.l1(0.001)))
 	return model
-
 
 def create_cnn(xtest, regularizer=None):
 	inputShape = (xtest.shape[1], xtest.shape[2])
@@ -97,7 +97,7 @@ ytest = keras.utils.to_categorical(ytest, num_classes)
 ytrain = keras.utils.to_categorical(ytrain, num_classes)
 dftrain=dftrain.reshape((dftrain.shape[0], (dftrain.shape[1]*dftrain.shape[2])))
 dftest=dftest.reshape((dftest.shape[0], (dftest.shape[1]*dftest.shape[2])))
-dftrain, dftest = process_structured_data(dftrain, dftest)
+#dftrain, dftest = process_structured_data(dftrain, dftest)
 # Create the MLP and CNN models
 mlp = create_mlp(dftrain.shape)
 cnn = create_cnn(xtest)
