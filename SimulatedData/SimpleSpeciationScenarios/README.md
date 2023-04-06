@@ -15,4 +15,4 @@ for the simulated dataset under the simple speciation scenarios with missing dat
 
 SimulateTraits.R - R script to simulate traits from the simulated coalescent trees.
 
-TrainedModels - Folder containing all the trained models resulting from running the file training notebooks.
+TrainedModels - Folder containing all the trained models resulting from running the training notebooks.
