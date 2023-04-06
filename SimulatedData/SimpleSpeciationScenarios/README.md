@@ -1,7 +1,4 @@
-# ***Euphorbia* scripts and datasets**
-This folder contains the empirical datasets of the plant *Euphorbia balsamifera* species complex  
-used to test our deep learning approach. 
-
+# **Simple speciation scenarios scripts and datasets**
 The folder contains the following files:
 
 simulate_ms_SNP_trees_CNN_theta005.py - python script to simulate coalescent trees and segregating sites (saved as NumPy arrays)
