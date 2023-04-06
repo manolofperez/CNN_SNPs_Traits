@@ -7,7 +7,7 @@ The folder contains the following files:
 simulate_ms_Euphorbia.py - python script to simulate coalescent trees and segregating sites (saved as NumPy arrays)
 for the *Euphorbia* dataset.
 
-Train_Test_Predict.ipynb -  python notebook containing code and outputs for CNN training, cross-validation 
+Train_Test_Predict_Euphorbia.ipynb -  python notebook containing code and outputs for CNN training, cross-validation 
 and prediction of the most likely model using empirical data.
 
 Pred_Emp_Comb_BM_Predictions.txt - Predictions for the model trained with the Combined SNPs + BM traits
