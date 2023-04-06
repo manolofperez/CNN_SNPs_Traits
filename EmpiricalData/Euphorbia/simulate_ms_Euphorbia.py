@@ -193,10 +193,10 @@ for i in range(Priorsize):
 	#Theta per site per generation (based on the estimates of Rincón-Barrado 2022). We divided the values by the average length of the sequences.
 	Theta = random.uniform(1,5)/400
 
-	## Sample Pa, Pb values between 0.5 and 1 (different species).
+	## Sample Pi values between 0.5 and 1 (different species).
 	Pab_inter1=random.uniform(0.5,1)
 	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time priors using the Pa and Pb values. Pa = 1−2/3*e^(−2τ/θA); τ = ln((Pa-1)*-3/2)*-θA/2
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau2 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
 	T2 = 4*tau2/Theta
 	tau1 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
