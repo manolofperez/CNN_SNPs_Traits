@@ -81,7 +81,6 @@ for i in range(Priorsize):
 
 	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
 	Pab_intra=random.uniform(1/3,0.4)
-	
 	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau5 = math.log((Pab_intra-1)*-3/2)*-Theta/2
 	## Transform divergence times to 4Ne generations units (required by ms)
@@ -120,20 +119,23 @@ for i in range(Priorsize):
 
 	## Sample Pi values between 0.5 and 1 (different species).
 	Pab_inter1=random.uniform(0.5,1)
-	## obtain divergence time priors using the Pa and Pb values. Pa = 1−2/3*e^(−2τ/θA); τ = ln((Pa-1)*-3/2)*-θA/2
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
+	## Transform divergence times to 4Ne generations units (required by ms)
 	T5 = 4*tau5/Theta
 
 	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
 	Pab_intra=random.uniform(1/3,0.4)
-	## divergence time prior following an uniform distribution from 0 to 0.1 (same species).
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau4 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Transform divergence times to 4Ne generations units (required by ms)
 	T4 = 4*tau4/Theta
+	## Sample the more recent splitting times with a smaller value than the more ancient one
 	T3 = random.uniform(0,T4)
 	T2 = random.uniform(0,T3)
 	T1 = random.uniform(0,T2)
 
-	## Set the Pa and Pb values for the second interspecific node to a default value (NA)
+	## Set the Pi values for the second interspecific node to a default value (0)
 	Pab_inter2 = 0
 
 	## ms command
@@ -143,6 +145,7 @@ for i in range(Priorsize):
 
 	## save parameter values and models
 	par_2sp.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	#Randomly save a number of tree equivalent to the number of traits
 	trees_2sp.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 2 simulations" % (float(i)/Priorsize*100))
 
@@ -161,17 +164,20 @@ for i in range(Priorsize):
 	## Sample Pi values between 0.5 and 1 (same species).
 	Pab_inter1=random.uniform(0.5,1)
 	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time priors using the Pa and Pb values. Pa = 1−2/3*e^(−2τ/θA); τ = ln((Pa-1)*-3/2)*-θA/2
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	T5 = 4*tau5/Theta
 	tau4 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
+	## Transform divergence times to 4Ne generations units (required by ms)
+	T5 = 4*tau5/Theta
 	T4 = 4*tau4/Theta
 
 	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
 	Pab_intra=random.uniform(1/3,0.4)
-	## divergence time prior following an uniform distribution from 0 to 0.1 (same species).
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
 	tau3 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Transform divergence times to 4Ne generations units (required by ms)
 	T3 = 4*tau3/Theta
+	## Sample the more recent splitting times with a smaller value than the more ancient one
 	T2 = random.uniform(0,T3)
 	T1 = random.uniform(0,T2)
 
@@ -181,12 +187,13 @@ for i in range(Priorsize):
 	Model_3sp.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 	## save parameter values
 	par_3sp.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	#Randomly save a number of tree equivalent to the number of traits
 	trees_3sp.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 3 simulations" % (float(i)/Priorsize*100))
-
 
 #Save the simulated SNP data
 Model_3sp=np.array(Model_3sp)
 np.savez_compressed('trainingSims/Model_3sp.npz', Model_3sp=Model_3sp)
+#Save trees from all scenarios
 trees=np.concatenate((trees_1sp,trees_2sp,trees_3sp),axis=0)
 np.savez_compressed('trees.npz', trees=trees)
