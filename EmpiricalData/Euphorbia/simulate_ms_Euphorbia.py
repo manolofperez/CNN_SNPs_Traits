@@ -19,7 +19,6 @@ def ms2nparray(xfile):
 		L = g[i+5:i+N_allpops+5]
 		q = []
 		for i in L:
-			#originally: i = [int(j) for j in list(i)], need to decode as python3 loads as ASCII (0->48; 1->49).
 			i = [int(j) for j in list(i.decode('utf-8'))]
 			i = np.array(i, dtype=np.int8)
 			q.append(i)
