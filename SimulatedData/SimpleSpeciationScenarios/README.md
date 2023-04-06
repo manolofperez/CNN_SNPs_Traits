@@ -4,7 +4,7 @@ The folder contains the following files:
 simulate_ms_SNP_trees_CNN_theta005.py - python script to simulate coalescent trees and segregating sites (saved as NumPy arrays)
 for the simulated dataset under the simple speciation scenarios.
 
-Test_SNPs_Traits.ipynb -  python notebook containing code and outputs for training and cross-validation 
+SpDel_SNP_Traits.ipynb -  python notebook containing code and outputs for training and cross-validation 
 for the simulated dataset under the simple speciation scenarios.
 
 MissingData_Samples_WeightedAverage_Test_SNPs_Traits.ipynb - python notebook containing code and outputs for training and cross-validation 
