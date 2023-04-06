@@ -10,24 +10,22 @@ for the *Euphorbia* dataset.
 Train_Test_Predict.ipynb -  python notebook containing code and outputs for CNN training, cross-validation 
 and prediction of the most likely model using empirical data.
 
-Pred_Emp_Comb_BM_Predictions.txt
+Pred_Emp_Comb_BM_Predictions.txt - Predictions for the model trained with the Combined SNPs + BM traits
 
-Pred_Emp_Comb_OU_Predictions.txt
+Pred_Emp_Comb_OU_Predictions.txt - Predictions for the model trained with the Combined SNPs + OU traits
 
-Pred_Emp_SNP_Predictions.txt
+Pred_Emp_SNP_Predictions.txt - Predictions for the model trained with SNPs
 
-Pred_Emp_traits_BM_Predictions.txt
+Pred_Emp_traits_BM_Predictions.txt - Predictions for the model trained with the BM traits
 
-Pred_Emp_traits_OU_Predictions.txt
+Pred_Emp_traits_OU_Predictions.txt - Predictions for the model trained with the OU traits
 
 input_SNPs.txt - Segregating sites from the empirical dataset.
 
-input_cont.txt
+input_traits_ade.txt - Traits for the *Euphorbia balsamifera* subsp. *adenensis*
 
-input_traits_ade.txt
+input_traits_bal.txt - Traits for the *Euphorbia balsamifera* subsp. *balsamifera*
 
-input_traits_bal.txt
-
-input_traits_sep.txt
+input_traits_sep.txt - Traits for the *Euphorbia balsamifera* subsp. *sepium*
 
 TrainedModels - Folder containing all the trained models resulting from running the file "Train_Test_Predict.ipynb".
