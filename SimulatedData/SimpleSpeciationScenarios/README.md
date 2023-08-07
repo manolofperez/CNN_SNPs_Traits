@@ -7,12 +7,6 @@ for the simulated dataset under the simple speciation scenarios.
 SpDel_SNP_Traits.ipynb -  python notebook containing code and outputs for training and cross-validation 
 for the simulated dataset under the simple speciation scenarios.
 
-SpDel_SNP_Traits_MissingSamples.ipynb - python notebook containing code and outputs for training and cross-validation 
-for the simulated dataset under the simple speciation scenarios with missing data inserted in all data from a percentage of samples.
-
-SpDel_SNP_Traits_MissingValues.ipynb - python notebook containing code and outputs for training and cross-validation 
-for the simulated dataset under the simple speciation scenarios with missing data inserted as a percentage of values scattered accross the matrix.
-
 SimulateTraits.R - R script to simulate traits from the simulated coalescent trees.
 
-TrainedModels - Folder containing all the trained models resulting from running the training notebooks.
+Subsets_MissingData_withOutputs - Folder containing python notebooks for the results obtained in subsamples and also for missing data inserted in the original SNP and trait matrices simulated under the simple speciation scenarios
