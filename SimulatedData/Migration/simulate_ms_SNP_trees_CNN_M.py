@@ -67,24 +67,18 @@ par_2sp_05 = open("par_2sp_05.txt","w")
 par_3sp_05 = open("par_3sp_05.txt","w")
 par_2sp_1 = open("par_2sp_1.txt","w")
 par_3sp_1 = open("par_3sp_1.txt","w")
-par_2sp_5 = open("par_2sp_5.txt","w")
-par_3sp_5 = open("par_3sp_5.txt","w")
 trees_2sp_01 = []
 trees_3sp_01 = []
 trees_2sp_05 = []
 trees_3sp_05 = []
 trees_2sp_1 = []
 trees_3sp_1 = []
-trees_2sp_5 = []
-trees_3sp_5 = []
 Model_2sp_01 = []
 Model_3sp_01 = []
 Model_2sp_05 = []
 Model_3sp_05 = []
 Model_2sp_1 = []
 Model_3sp_1 = []
-Model_2sp_5 = []
-Model_3sp_5 = []
 
 ###Migration 0.1
 ## Two species, AB and CDEF
@@ -93,34 +87,32 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (different species).
-	Pab_inter1=random.uniform(0.5,1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1=random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
+	T1 = 4*tau5/Theta
 
-	## Sample Pa, Pb values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau4 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi2=random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T4 = 4*tau4/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T3 = random.uniform(0,T4)
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+	T2 = 4*tau2/Theta
 
-	## Set the Pa and Pb values for the second interspecific node to a default value (NA)
-	Pab_inter2 = 0
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T3 = random.uniform(0,T2)
+	T4 = random.uniform(0,T3)
+	T5 = random.uniform(0,T4)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 0.1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 0.1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_2sp_01.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 
 	## save parameter values and trees
-	par_2sp_01.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_2sp_01.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_2sp_01.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 2sp_01 simulations" % (float(i)/Priorsize*100))
@@ -137,33 +129,38 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (same species).
-	Pab_inter1=random.uniform(0.5,1)
-	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	tau4 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1 = random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
-	T4 = 4*tau4/Theta
+	T1 = 4*tau1/Theta
 
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau3 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) that are higer than 0.5 (different species) but lower than the deepest node (Pi1).
+	Pi2 = random.uniform(0.5,Pi1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
+	## Transform divergence times to 4Ne generations units (required by ms)
+	T2 = 4*tau2/Theta
+
+	## Sample Pi values for the oldest intraspecific node (Pi3) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi3=random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau3 = -(Theta*math.log(-(3*Pi3-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
 	T3 = 4*tau3/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T4 = random.uniform(0,T4)
+	T5 = random.uniform(0,T5)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 0.1 -ej %f 5 3 -eM %f 0.1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 0.1 -ej %f 5 3 -eM %f 0.1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_3sp_01.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 	
 	## save parameter values and trees
-	par_3sp_01.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_3sp_01.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_3sp_01.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 3sp_01 simulations" % (float(i)/Priorsize*100))
@@ -181,34 +178,32 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (different species).
-	Pab_inter1=random.uniform(0.5,1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1 = random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
+	T1 = 4*tau1/Theta
 
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau4 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi2 = random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T4 = 4*tau4/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T3 = random.uniform(0,T4)
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+	T2 = 4*tau2/Theta
 
-	## Set the Pa and Pb values for the second interspecific node to a default value (NA)
-	Pab_inter2 = 0
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T3 = random.uniform(0,T2)
+	T4 = random.uniform(0,T3)
+	T5 = random.uniform(0,T4)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 0.5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 0.5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_2sp_05.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 
 	## save parameter values and trees
-	par_2sp_05.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_2sp_05.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_2sp_05.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 2sp_05 simulations" % (float(i)/Priorsize*100))
@@ -225,33 +220,38 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (same species).
-	Pab_inter1=random.uniform(0.5,1)
-	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	tau4 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1 = random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
-	T4 = 4*tau4/Theta
+	T1 = 4*tau1/Theta
 
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau3 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) that are higer than 0.5 (different species) but lower than the deepest node (Pi1).
+	Pi2 = random.uniform(0.5,Pi1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
+	## Transform divergence times to 4Ne generations units (required by ms)
+	T2 = 4*tau2/Theta
+
+	## Sample Pi values for the oldest intraspecific node (Pi3) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi3=random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau3 = -(Theta*math.log(-(3*Pi3-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
 	T3 = 4*tau3/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T4 = random.uniform(0,T4)
+	T5 = random.uniform(0,T5)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 0.5 -ej %f 5 3 -eM %f 0.5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 0.5 -ej %f 5 3 -eM %f 0.5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_3sp_05.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 	
 	## save parameter values and trees
-	par_3sp_05.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_3sp_05.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_3sp_05.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 3sp_05 simulations" % (float(i)/Priorsize*100))
@@ -268,34 +268,32 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (different species).
-	Pab_inter1=random.uniform(0.5,1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1 = random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
+	T1 = 4*tau1/Theta
 
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau4 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi2 = random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T4 = 4*tau4/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T3 = random.uniform(0,T4)
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+	T2 = 4*tau2/Theta
 
-	## Set the Pa and Pb values for the second interspecific node to a default value (NA)
-	Pab_inter2 = 0
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T3 = random.uniform(0,T2)
+	T4 = random.uniform(0,T3)
+	T5 = random.uniform(0,T4)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_2sp_1.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 
 	## save parameter values and trees
-	par_2sp_1.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_2sp_1.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_2sp_1.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 2sp_1 simulations" % (float(i)/Priorsize*100))
@@ -312,33 +310,38 @@ for i in range(Priorsize):
 	## Theta value of 0.005
 	Theta = 0.005
 
-	## Sample Pi values between 0.5 and 1 (same species).
-	Pab_inter1=random.uniform(0.5,1)
-	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	tau4 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
+	## Sample Pi values for the deepest node (Pi1) between 0.5 and 1 (different species).
+	Pi1 = random.uniform(0.5,1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau1 = -(Theta*math.log(-(3*Pi1-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
-	T4 = 4*tau4/Theta
+	T1 = 4*tau1/Theta
 
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau3 = math.log((Pab_intra-1)*-3/2)*-Theta/2
+	## Sample Pi values for the second deepest node (Pi2) that are higer than 0.5 (different species) but lower than the deepest node (Pi1).
+	Pi2 = random.uniform(0.5,Pi1)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau2 = -(Theta*math.log(-(3*Pi2-3)/2)/2)  
+	## Transform divergence times to 4Ne generations units (required by ms)
+	T2 = 4*tau2/Theta
+
+	## Sample Pi values for the oldest intraspecific node (Pi3) between 1/3 (minimum value -> 0.333) and 0.4 (same species).
+	Pi3=random.uniform(1/3,0.4)
+	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = -(θ*ln(-(3*Pi-3)/2)/2)
+	tau3 = -(Theta*math.log(-(3*Pi3-3)/2)/2)  
 	## Transform divergence times to 4Ne generations units (required by ms)
 	T3 = 4*tau3/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
+
+	## Sample the more recent splitting times with a smaller value than the more ancient ones and bigger than 0 (present)
+	T4 = random.uniform(0,T4)
+	T5 = random.uniform(0,T5)
 
 	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 1 -ej %f 5 3 -eM %f 1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
+	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 1 -ej %f 5 3 -eM %f 1 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T5, T4, T3, T3, T2, T2, T1), shell=True, stdout=subprocess.PIPE).stdout
 	output = com.read().splitlines()
 	Model_3sp_1.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
 	
 	## save parameter values and trees
-	par_3sp_1.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
+	par_3sp_1.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pi1, Pi2,T1,T2,T3,T4,T5))
 	#Randomly save a number of tree equivalent to the number of traits
 	trees_3sp_1.append(random.sample(get_newick(output),100))
 	print("Completed %d %% of Model 3sp_1 simulations" % (float(i)/Priorsize*100))
@@ -348,91 +351,6 @@ Model_3sp_1=np.array(Model_3sp_1)
 np.savez_compressed('trainingSims/Model_3sp_1.npz', Model_3sp_1=Model_3sp_1)
 del(Model_3sp_1)
 
-###Migration 5
-## Two species, AB and CDEF
-for i in range(Priorsize):
-
-	## Theta value of 0.005
-	Theta = 0.005
-
-	## Sample Pi values between 0.5 and 1 (different species).
-	Pab_inter1=random.uniform(0.5,1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
-
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau4 = math.log((Pab_intra-1)*-3/2)*-Theta/2
-	## Transform divergence times to 4Ne generations units (required by ms)
-	T4 = 4*tau4/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T3 = random.uniform(0,T4)
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
-
-	## Set the Pi values for the second interspecific node to a default value (0)
-	Pab_inter2 = 0
-
-	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -ej %f 5 3 -eM %f 5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
-	output = com.read().splitlines()
-	Model_2sp_5.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
-
-	## save parameter values and trees
-	par_2sp_5.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
-	#Randomly save a number of tree equivalent to the number of traits
-	trees_2sp_5.append(random.sample(get_newick(output),100))
-	print("Completed %d %% of Model 2sp_5 simulations" % (float(i)/Priorsize*100))
-
-#Save the simulated SNP data
-Model_2sp_5=np.array(Model_2sp_5)
-np.savez_compressed('trainingSims/Model_2sp_5.npz', Model_2sp_5=Model_2sp_5)
-del(Model_2sp_5)
-
-
-## Three species
-for i in range(Priorsize):
-
-	## Theta value of 0.005
-	Theta = 0.005
-
-	## Sample Pi values between 0.5 and 1 (same species).
-	Pab_inter1=random.uniform(0.5,1)
-	Pab_inter2=random.uniform(0.5,Pab_inter1)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau5 = math.log((Pab_inter1-1)*-3/2)*-Theta/2
-	tau4 = math.log((Pab_inter2-1)*-3/2)*-Theta/2
-	## Transform divergence times to 4Ne generations units (required by ms)
-	T5 = 4*tau5/Theta
-	T4 = 4*tau4/Theta
-
-	## Sample Pi values between 1/3 (minimum value -> 0.333) and 0.4 (same species).
-	Pab_intra=random.uniform(1/3,0.4)
-	## obtain divergence time (tau - τ) priors using the Pi values. Pi = 1−2/3*e^(−2τ/θ); τ = ln((Pi-1)*-3/2)*-θ/2
-	tau3 = math.log((Pab_intra-1)*-3/2)*-Theta/2
-	## Transform divergence times to 4Ne generations units (required by ms)
-	T3 = 4*tau3/Theta
-	## Sample the more recent splitting times with a smaller value than the more ancient one
-	T2 = random.uniform(0,T3)
-	T1 = random.uniform(0,T2)
-
-	## ms command
-	com=subprocess.Popen("./ms %d 1000 -s 1 -t %f -I 6 %d %d %d %d %d %d -ej %f 2 1 -ej %f 4 3 -ej %f 6 5 -eM %f 5 -ej %f 5 3 -eM %f 5 -ej %f 3 1 -T" % (N_allpops, Theta, N_popA, N_popB, N_popC, N_popD, N_popE, N_popF, T1, T2, T3, T3, T4, T4, T5), shell=True, stdout=subprocess.PIPE).stdout
-	output = com.read().splitlines()
-	Model_3sp_5.append(np.array(ms2nparray(output)).swapaxes(0,1).reshape(N_allpops,-1).T)
-	
-	## save parameter values and trees
-	par_3sp_5.write("%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\n" % (Pab_intra, Pab_inter1, Pab_inter2,T1,T2,T3,T4,T5))
-	#Randomly save a number of tree equivalent to the number of traits
-	trees_3sp_5.append(random.sample(get_newick(output),100))
-	print("Completed %d %% of Model 3sp_5 simulations" % (float(i)/Priorsize*100))
-
-#Save the simulated SNP data
-Model_3sp_5=np.array(Model_3sp_5)
-np.savez_compressed('trainingSims/Model_3sp_5.npz', Model_3sp_5=Model_3sp_5)
 #Save trees from all scenarios
-trees=np.concatenate((trees_2sp_01,trees_3sp_01,trees_2sp_05,trees_3sp_05,trees_2sp_1,trees_3sp_1,trees_2sp_5,trees_3sp_5),axis=0)
+trees=np.concatenate((trees_2sp_01,trees_3sp_01,trees_2sp_05,trees_3sp_05,trees_2sp_1,trees_3sp_1),axis=0)
 np.savez_compressed('trees.npz', trees=trees)
